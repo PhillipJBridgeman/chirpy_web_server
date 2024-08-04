@@ -26,14 +26,10 @@ func main() {
 	// Wrap the fileserver handler with the middleware
 	mux.Handle("/app/", cfg.middlewareMetricsInc(http.StripPrefix("/app", fileServer)))
 
-	// Register the metrics handler
-	mux.HandleFunc("/metrics", cfg.metricsHandler)
-
-	// Register the reset handler
-	mux.HandleFunc("/reset", cfg.resetHandler)
-
-	// Register the healthz handler
-	mux.Handle("/healthz", http.HandlerFunc(healthzHandler))
+	// Register the handlers with method-based pattern matching
+	mux.HandleFunc("GET /healthz", healthzHandler)
+	mux.HandleFunc("GET /metrics", cfg.metricsHandler)
+	mux.HandleFunc("POST /reset", cfg.resetHandler)
 
 	server := &http.Server{
 		Addr:    "localhost:8080",
